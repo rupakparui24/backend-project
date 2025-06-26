@@ -6,4 +6,17 @@ dotenv.config({
 });
 
 
-connectDB();
+connectDB()
+.then(()=> {
+    app.on("error", (err) => {
+        console.log("Server Error: ", err);
+        throw err;
+    });
+    app.listen (process.env.PORT || 8000,() => {
+        console.log(`Server is running on port ${process.env.PORT || 8000}`);
+    })
+})
+
+.catch((err) => {
+    console.log("Mino DB connection Failed: ",err)
+})
