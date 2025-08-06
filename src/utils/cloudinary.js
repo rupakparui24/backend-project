@@ -17,7 +17,9 @@ const uploadOnClodinary = async (localFilePath) => {
                resource_type: 'auto',
            }
        )
-        console.log('File uploaded successfully:', uploadResult.url);
+       //file uploaded successfully
+        //console.log('File uploaded successfully:', uploadResult.url);  // used it for debugging
+        fs.unlinkSunc(localFilePath); // Delete the file after upload
         return uploadResult;
     } catch (error) {
         fs.unlinkSync(localFilePath); // Delete the file if upload fails
