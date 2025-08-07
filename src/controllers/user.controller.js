@@ -32,13 +32,24 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     const avatarLocalPath = req.files?.avatar[0]?.path;
-    const coverImageLocalPath = req.files?.coverImage[0]?.path;
+    // const avatarLocalPath = Array.isArray(req.files?.avatar) && req.files.avatar.length > 0 ? req.files.avatar[0].path : undefined;  //was given by gpt, when i didn't uploaded images
+    //const coverImageLocalPath = req.files?.coverImage[0]?.path;   //this is working like avatar which is required, but it is not required, so when we are not sending any cover image it will throw an error.
+    // const coverImageLocalPath = req.files?.coverImage?.[0]?.path || ""; // Optional cover image; this is given by gpt, will also work
+    let coverImageLocalPath;
+    if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+        coverImageLocalPath = req.files.coverImage[0].path;   
+    }
     if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar is required");
     }
-
+    // console.log("Uploading avatar from path:", avatarLocalPath);
     const avatar = await uploadOnClodinary(avatarLocalPath);
-    const coverImage = await uploadOnClodinary(coverImageLocalPath);
+    // console.log("Avatar upload result:", avatar);
+    // const coverImage = await uploadOnClodinary(coverImageLocalPath); //was throwing error
+    let coverImage;
+    if (coverImageLocalPath) {
+        coverImage = await uploadOnClodinary(coverImageLocalPath);
+    }
     if (!avatar) {
         throw new ApiError(500, "Failed to upload avatar");
     }
