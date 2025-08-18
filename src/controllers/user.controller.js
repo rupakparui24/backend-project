@@ -1,7 +1,7 @@
 import {asyncHandler} from '../utils/asyncHandler.js';
 import {ApiError} from '../utils/ApiError.js';
 import { User } from '../models/user.model.js';
-import { uploadOnClodinary } from '../utils/cloudinary.js';
+import { uploadOnClodinary, deleteFromCloudinary} from '../utils/cloudinary.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import jwt from 'jsonwebtoken'
 
@@ -291,10 +291,10 @@ const updateAvatar = asyncHandler(async (req, res) => {
     }
 
     //TODO: delete old avatar from cloudinary if exists
-    // const oldAvatar = req.user?.avatar; // Assuming you have the old avatar URL in req.user
-    // if (oldAvatar) {
-    //     await deleteFromCloudinary(oldAvatar);
-    // }
+    const oldAvatar = req.user?.avatar; // Assuming you have the old avatar URL in req.user
+    if (oldAvatar) {
+        await deleteFromCloudinary(oldAvatar);
+    }
     
     const user = await User.findByIdAndUpdate(
         req.user._id,
@@ -323,6 +323,10 @@ const updateCoverImage = asyncHandler(async (req, res) => {
     const coverImage = await uploadOnClodinary(coverImageLocalPath);
     if (!coverImage.url) {
         throw new ApiError(500, "Failed to upload cover image");
+    }
+    const oldCoverImage = req.user?.coverImage; // Assuming you have the old cover image URL in req.user
+    if (oldCoverImage) {
+        await deleteFromCloudinary(oldCoverImage);
     }
     const user = await User.findByIdAndUpdate(
         req.user._id,
